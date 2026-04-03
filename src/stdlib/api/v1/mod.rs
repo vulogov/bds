@@ -26,6 +26,10 @@ pub fn init_api(io: &mut IoHandler) {
             "bund_language_parser".to_string(),
             Value::String(bund_language_parser::version().into()),
         );
+        result.insert(
+            "database_core".to_string(),
+            Value::String(bund_blobstore::version().into()),
+        );
         Ok(Value::Object(result))
     });
 }

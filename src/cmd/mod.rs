@@ -48,6 +48,7 @@ pub fn main() {
     );
     log::debug!("BUNDCORE version: {}", bundcore::version());
     log::debug!("BLOB STORE version: {}", bund_blobstore::version());
+    log::debug!("DEEPTHOUGHT version: {}", deepthought::version());
     log::debug!("Initialize global CLI");
     drop(init_cli);
     log::debug!("BDS server context initialized ...");
