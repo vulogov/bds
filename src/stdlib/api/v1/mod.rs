@@ -30,6 +30,10 @@ pub fn init_api(io: &mut IoHandler) {
             "database_core".to_string(),
             Value::String(bund_blobstore::version().into()),
         );
+        result.insert(
+            "deepthought".to_string(),
+            Value::String(deepthought::version().into()),
+        );
         Ok(Value::Object(result))
     });
 }
