@@ -47,6 +47,7 @@ pub fn main() {
         build::BUILD_TIME
     );
     log::debug!("BUNDCORE version: {}", bundcore::version());
+    log::debug!("BLOB STORE version: {}", bund_blobstore::version());
     log::debug!("Initialize global CLI");
     drop(init_cli);
     log::debug!("BDS server context initialized ...");
@@ -55,6 +56,12 @@ pub fn main() {
         log::debug!("Enable BDS profiler");
         time_graph::enable_data_collection(true);
     }
+
+    let db = match crate::stdlib::DB.read() {
+        Ok(db) => db,
+        Err(e) => panic!("Unable to read lock database: {}", e),
+    };
+    drop(db);
 
     match &cli.command {
         Commands::Serve(serve) => {

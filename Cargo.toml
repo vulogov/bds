@@ -28,3 +28,4 @@ rust_dynamic = "0.*.*"
 bund_language_parser = ">=0.*.*"
 bundcore = ">=0.*.*"
 rust_multistackvm = ">=0.*.*"
+bund_blobstore = { path = "../bund_blobstore" }
