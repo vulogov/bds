@@ -64,6 +64,12 @@ pub fn main() {
     };
     drop(db);
 
+    let vdb = match crate::stdlib::VDB.read() {
+        Ok(db) => db,
+        Err(e) => panic!("Unable to read lock vector database: {}", e),
+    };
+    drop(vdb);
+
     match &cli.command {
         Commands::Serve(serve) => {
             bds_serve::run(&cli, serve.clone());
@@ -103,13 +109,27 @@ pub struct Cli {
     #[clap(long, action = clap::ArgAction::SetTrue, help="Execute internal profiler")]
     pub profile: bool,
 
-    #[clap(help = "Full path to the OMATRIX storage", long)]
+    #[clap(help = "Full path to the BDS storage", long)]
     pub store_path: Option<String>,
+
+    #[clap(help = "Full path to the BDS vector storage", long)]
+    pub vector_path: Option<String>,
+
+    #[clap(help = "Full path to GGUF chat model", required = true, short, long)]
+    pub chat_model: String,
+
+    #[clap(
+        help = "Full path to the GGUF vector store embedding model",
+        required = true,
+        short,
+        long
+    )]
+    pub embed_model: String,
 
     #[clap(long, action = clap::ArgAction::SetTrue, help="Re-initialize the database")]
     pub new_database: bool,
 
-    #[clap(subcommand, help = "OMATRIX subcommands")]
+    #[clap(subcommand, help = "BDS subcommands")]
     command: Commands,
 }
 
