@@ -1,0 +1,30 @@
+[package]
+name = "bds"
+version = "0.1.0"
+edition = "2024"
+
+[build-dependencies]
+shadow-rs = "1.5.0"
+
+[dependencies]
+clap = { version = "4.5.*", features = ["derive"] }
+curl = "0.4.46"
+better-panic = "0.3.0"
+easy-error = "1.0.*"
+easy_reader = "0.5.2"
+env_logger = "0.11.*"
+log = "0.4.*"
+lazy_static = "1.5.0"
+time-graph = { version="0.3.2", features=["table"] }
+cfonts = "1.3.0"
+serde = { version = "1.0.*", features = ["derive"] }
+serde_json = { version = "1.0.*", default-features = true }
+nanoid = "0.4.0"
+jsonrpc-http-server = "15.0"
+ctrlc = "3.5.1"
+comfy-table = "7.2.1"
+shadow-rs = "1.5.0"
+rust_dynamic = "0.*.*"
+bund_language_parser = ">=0.*.*"
+bundcore = ">=0.*.*"
+rust_multistackvm = ">=0.*.*"
