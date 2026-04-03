@@ -6,7 +6,6 @@ pub mod setloglevel;
 
 use clap::{Args, Parser, Subcommand};
 use lazy_static::lazy_static;
-use shadow_rs::{COMMIT_AUTHOR, COMMIT_DATE, COMMIT_EMAIL, COMMIT_HASH};
 use std::env;
 use std::sync::Mutex;
 use time_graph;
@@ -37,7 +36,7 @@ pub fn main() {
     do_panic();
     let init_cli = CLI.lock().unwrap();
     log::debug!(
-        "OMLOG tool version:{}, tag:{}, branch:{}, commit date: {}, commit author:{}({}), commit_id:{}. Build at {}",
+        "BDS server tool version:{}, tag:{}, branch:{}, commit date: {}, commit author:{}({}), commit_id:{}. Build at {}",
         build::VERSION,
         build::TAG,
         build::BRANCH,
@@ -50,36 +49,12 @@ pub fn main() {
     log::debug!("BUNDCORE version: {}", bundcore::version());
     log::debug!("Initialize global CLI");
     drop(init_cli);
-    log::debug!("OMATRIX tool context initialized ...");
+    log::debug!("BDS server context initialized ...");
 
     if cli.profile {
-        log::debug!("Enable OMATRIX profiler");
+        log::debug!("Enable BDS profiler");
         time_graph::enable_data_collection(true);
     }
-
-    let db = match crate::stdlib::DB.read() {
-        Ok(db) => db,
-        Err(e) => panic!("Unable to read lock database: {}", e),
-    };
-    drop(db);
-    log::debug!("Read lock database: success");
-    let db = match crate::stdlib::DB.write() {
-        Ok(db) => db,
-        Err(e) => panic!("Unable to read lock database: {}", e),
-    };
-    log::debug!("Write lock database: success");
-    if cli.new_database {
-        log::debug!("Re-initialize the database");
-        match db.reinitialize() {
-            Ok(_) => {}
-            Err(err) => {
-                drop(db);
-                log::error!("{}", err);
-                return;
-            }
-        }
-    }
-    drop(db);
 
     match &cli.command {
         Commands::Serve(serve) => {
@@ -104,12 +79,12 @@ enum Commands {
 }
 
 #[derive(Parser, Clone, Debug)]
-#[clap(name = "omatrix")]
-#[clap(author = "Vladimir Ulogov <vladimir@ulogtov.us>")]
+#[clap(name = "bds")]
+#[clap(author = "Vladimir Ulogov <vladimir@ulogov.us>")]
 #[clap(version = env!("CARGO_PKG_VERSION"))]
 #[clap(
-    about = "OMATRIX - Observability Matrix Tool",
-    long_about = "Matrix-based analytical tool for observability and telemetry"
+    about = "BDS - Universal Data Platform",
+    long_about = "Programmatic data storage and analytics engine"
 )]
 #[command(version, about, long_about = None)]
 pub struct Cli {
@@ -131,7 +106,7 @@ pub struct Cli {
 }
 
 #[derive(Args, Clone, Debug)]
-#[clap(about = "Start OMATRIX server")]
+#[clap(about = "Start BDS server")]
 pub struct Serve {
     #[clap(help = "BIND address for JSON/RPC service", long)]
     pub bind_addr: Option<String>,
@@ -141,5 +116,5 @@ pub struct Serve {
 }
 
 #[derive(Args, Clone, Debug)]
-#[clap(about = "Get the version of the OMATRIX")]
+#[clap(about = "Get the version of the BDS")]
 pub struct Version {}

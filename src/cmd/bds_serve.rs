@@ -19,7 +19,7 @@ pub fn run(cli: &Cli, serve_args: Serve) {
     log::debug!("SERVE::run() reached");
     let _ = match &cli.store_path {
         Some(path) => {
-            log::debug!("OMLOG database is expected to be in: {}", &path);
+            log::debug!("BDS database is expected to be in: {}", &path);
         }
         None => {
             log::error!("Store path not provided");

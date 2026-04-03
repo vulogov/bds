@@ -11,7 +11,7 @@ pub fn init_api(io: &mut IoHandler) {
     io.add_method("v1/version", |_params: Params| {
         let mut result: Map<String, Value> = Map::new();
         result.insert(
-            "omatrix".to_string(),
+            "bds".to_string(),
             Value::String(env!("CARGO_PKG_VERSION").into()),
         );
         result.insert(

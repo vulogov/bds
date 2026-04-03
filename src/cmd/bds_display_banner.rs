@@ -18,7 +18,7 @@ pub fn banner_small(s: &String) -> String {
     .text
 }
 
-pub fn omatrix_banner() -> String {
-    let ban = format!("OMATRIX {}", env!("CARGO_PKG_VERSION"));
+pub fn bds_banner() -> String {
+    let ban = format!("BDS {}", env!("CARGO_PKG_VERSION"));
     banner(&ban)
 }
