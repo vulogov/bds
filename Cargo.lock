@@ -289,6 +289,7 @@ dependencies = [
  "easy-error",
  "easy_reader",
  "env_logger",
+ "fastembed",
  "jsonrpc-http-server",
  "lazy_static",
  "log",

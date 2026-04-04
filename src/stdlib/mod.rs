@@ -2,7 +2,7 @@ extern crate log;
 
 use crate::cmd::CLI;
 use bund_blobstore::{CacheConfig, ShardManager, ShardManagerBuilder, ShardingStrategy};
-use deepthought::{DeepThought, DeepThoughtBuilder};
+use deepthought::DeepThoughtVecStore;
 use lazy_static::lazy_static;
 use std::sync::RwLock;
 use std::time::Duration;
@@ -42,7 +42,7 @@ lazy_static! {
 }
 
 lazy_static! {
-    pub static ref VDB: RwLock<DeepThought> = {
+    pub static ref VDB: RwLock<DeepThoughtVecStore> = {
         let cli = match CLI.lock() {
             Ok(cli) => cli,
             Err(e) => panic!("Unable to lock CLI: {}", e),
@@ -51,29 +51,21 @@ lazy_static! {
             Some(path) => path,
             None => panic!("No vector store path specified"),
         };
-        let dt = match DeepThoughtBuilder::new()
-            .chat_model_gguf(cli.chat_model.to_string())
-            .embed_model_gguf(cli.embed_model.to_string())
-            .dbpath(vector_path.to_string())
-            .chunk_size(1024)
-            .chunk_overlap(16)
-            .embedding_doc_prefix("search_document".to_string())
-            .embedding_query_prefix("search_query".to_string())
-            .build()
-        {
-            Ok(mut dt) => {
-                match dt.save_store() {
+        let vecstore = match DeepThoughtVecStore::new(vector_path) {
+            Ok(vecstore) => {
+                match vecstore.save_vectorstore() {
                     Ok(_) => {}
                     Err(err) => panic!("{}", err),
                 };
-                RwLock::new(dt)
+                RwLock::new(vecstore)
             }
-            Err(e) => panic!("Error creating DT instance: {}", e),
+            Err(err) => panic!("{}", err),
         };
+
         log::debug!(
             "BDS vector database initialized in: {}",
             vector_path.clone()
         );
-        dt
+        vecstore
     };
 }
