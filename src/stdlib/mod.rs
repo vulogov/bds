@@ -1,17 +1,15 @@
 extern crate log;
 
 use crate::cmd::CLI;
-use bund_blobstore::{CacheConfig, ShardManager, ShardManagerBuilder, ShardingStrategy};
-use deepthought::DeepThoughtVecStore;
+use bund_blobstore::{DataDistributionManager, DistributionStrategy};
 use lazy_static::lazy_static;
-use std::sync::RwLock;
-use std::time::Duration;
+use std::sync::{Arc, RwLock};
 
 pub mod api;
 pub mod common;
 
 lazy_static! {
-    pub static ref DB: RwLock<ShardManager> = {
+    pub static ref DB: Arc<RwLock<DataDistributionManager>> = {
         let cli = match CLI.lock() {
             Ok(cli) => cli,
             Err(e) => panic!("Unable to lock CLI: {}", e),
@@ -20,21 +18,12 @@ lazy_static! {
             Some(path) => path,
             None => panic!("No store path specified"),
         };
-        // Configure cache
-        let cache_config = CacheConfig {
-            enabled: true,
-            max_size: 5000,
-            default_ttl: Duration::from_secs(300),
-            key_cache_ttl: Duration::from_secs(600),
-            time_cache_ttl: Duration::from_secs(300),
-        };
-        let manager = match ShardManagerBuilder::new()
-            .with_strategy(ShardingStrategy::KeyHash)
-            .with_cache_config(cache_config)
-            .add_shard("shard1", &format!("{}/shard1.bds", &db_path))
-            .build() {
-                Ok(manager) => RwLock::new(manager),
-                Err(e) => panic!("Unable to open database: {}", e),
+        let manager = match DataDistributionManager::new(
+            format!("{}/blob", &db_path),
+            DistributionStrategy::RoundRobin,
+        ) {
+            Ok(manager) => Arc::new(RwLock::new(manager)),
+            Err(err) => panic!("Error init main db: {}", err),
         };
         log::debug!("BDS database initialized in: {}", db_path.clone());
         manager
@@ -42,30 +31,23 @@ lazy_static! {
 }
 
 lazy_static! {
-    pub static ref VDB: RwLock<DeepThoughtVecStore> = {
+    pub static ref LOGS: Arc<RwLock<DataDistributionManager>> = {
         let cli = match CLI.lock() {
             Ok(cli) => cli,
             Err(e) => panic!("Unable to lock CLI: {}", e),
         };
-        let vector_path = match &cli.vector_path {
+        let db_path = match &cli.store_path {
             Some(path) => path,
-            None => panic!("No vector store path specified"),
+            None => panic!("No store path specified"),
         };
-        let vecstore = match DeepThoughtVecStore::new(vector_path) {
-            Ok(vecstore) => {
-                match vecstore.save_vectorstore() {
-                    Ok(_) => {}
-                    Err(err) => panic!("{}", err),
-                };
-                RwLock::new(vecstore)
-            }
-            Err(err) => panic!("{}", err),
+        let manager = match DataDistributionManager::new(
+            format!("{}/logs", &db_path),
+            DistributionStrategy::RoundRobin,
+        ) {
+            Ok(manager) => Arc::new(RwLock::new(manager)),
+            Err(err) => panic!("Error init main db: {}", err),
         };
-
-        log::debug!(
-            "BDS vector database initialized in: {}",
-            vector_path.clone()
-        );
-        vecstore
+        log::debug!("BDS database initialized in: {}", db_path.clone());
+        manager
     };
 }

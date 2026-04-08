@@ -10,17 +10,17 @@ pub fn setloglevel(c: &cmd::Cli) {
             log::debug!("Set loglevel from environment");
         }
         1 => {
-            let env = Env::default().filter_or("BDS_LOG_LEVEL", "bds=info");
+            let env = Env::default().filter_or("BDS_LOG_LEVEL", "bund_blobstore,bds=info");
             env_logger::init_from_env(env);
             log::debug!("Set loglevel=info");
         }
         2 => {
-            let env = Env::default().filter_or("BDS_LOG_LEVEL", "bds=debug");
+            let env = Env::default().filter_or("BDS_LOG_LEVEL", "bund_blobstore,bds=debug");
             env_logger::init_from_env(env);
             log::debug!("Set loglevel=debug");
         }
         _ => {
-            let env = Env::default().filter_or("BDS_LOG_LEVEL", "bds=trace");
+            let env = Env::default().filter_or("BDS_LOG_LEVEL", "bund_blobstore,bds=trace");
             env_logger::init_from_env(env);
             log::debug!("Set loglevel=trace");
         }

@@ -63,12 +63,11 @@ pub fn main() {
         Err(e) => panic!("Unable to read lock database: {}", e),
     };
     drop(db);
-
-    let vdb = match crate::stdlib::VDB.read() {
+    let db = match crate::stdlib::LOGS.read() {
         Ok(db) => db,
-        Err(e) => panic!("Unable to read lock vector database: {}", e),
+        Err(e) => panic!("Unable to read lock logs database: {}", e),
     };
-    drop(vdb);
+    drop(db);
 
     match &cli.command {
         Commands::Serve(serve) => {
