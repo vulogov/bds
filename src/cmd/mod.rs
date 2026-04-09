@@ -36,7 +36,7 @@ pub fn main() {
     do_panic();
     let init_cli = CLI.lock().unwrap();
     log::debug!(
-        "BDS server tool version:{}, tag:{}, branch:{}, commit date: {}, commit author:{}({}), commit_id:{}. Build at {}",
+        "BDS (BUND DATA SHELL) server and cli tool version:{}, tag:{}, branch:{}, commit date: {}, commit author:{}({}), commit_id:{}. Build at {}",
         build::VERSION,
         build::TAG,
         build::BRANCH,
@@ -48,7 +48,6 @@ pub fn main() {
     );
     log::debug!("BUNDCORE version: {}", bundcore::version());
     log::debug!("BLOB STORE version: {}", bund_blobstore::version());
-    log::debug!("DEEPTHOUGHT version: {}", deepthought::version());
     log::debug!("Initialize global CLI");
     drop(init_cli);
     log::debug!("BDS server context initialized ...");
@@ -57,17 +56,6 @@ pub fn main() {
         log::debug!("Enable BDS profiler");
         time_graph::enable_data_collection(true);
     }
-
-    let db = match crate::stdlib::DB.read() {
-        Ok(db) => db,
-        Err(e) => panic!("Unable to read lock database: {}", e),
-    };
-    drop(db);
-    let db = match crate::stdlib::LOGS.read() {
-        Ok(db) => db,
-        Err(e) => panic!("Unable to read lock logs database: {}", e),
-    };
-    drop(db);
 
     match &cli.command {
         Commands::Serve(serve) => {
@@ -109,24 +97,7 @@ pub struct Cli {
     pub profile: bool,
 
     #[clap(help = "Full path to the BDS storage", long)]
-    pub store_path: Option<String>,
-
-    #[clap(help = "Full path to the BDS vector storage", long)]
-    pub vector_path: Option<String>,
-
-    #[clap(help = "Full path to GGUF chat model", required = true, short, long)]
-    pub chat_model: String,
-
-    #[clap(
-        help = "Full path to the GGUF vector store embedding model",
-        required = true,
-        short,
-        long
-    )]
-    pub embed_model: String,
-
-    #[clap(long, action = clap::ArgAction::SetTrue, help="Re-initialize the database")]
-    pub new_database: bool,
+    pub database: Option<String>,
 
     #[clap(subcommand, help = "BDS subcommands")]
     command: Commands,

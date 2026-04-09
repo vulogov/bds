@@ -17,7 +17,7 @@ fn serve_ctrl_c_handler(server_handle: &mut CloseHandle) {
 #[time_graph::instrument]
 pub fn run(cli: &Cli, serve_args: Serve) {
     log::debug!("SERVE::run() reached");
-    let _ = match &cli.store_path {
+    let _ = match &cli.database {
         Some(path) => {
             log::debug!("BDS database is expected to be in: {}", &path);
         }
